@@ -1,45 +1,42 @@
-FROM python:3.12-slim-bullseye
+# Используем образ Python
+FROM python:3.12-bullseye
 
 LABEL authors="jay"
 
-RUN mkdir -p /home/app
+# Создаем рабочую директорию
+WORKDIR /home/app
 
+# Устанавливаем зависимости системы
 RUN apt-get update && apt-get install -y \
     build-essential \
     gcc \
     python3-dev \
     libpq-dev \
     binutils \
-    libproj-dev\
+    libproj-dev \
+    gdal-bin\
     && rm -rf /var/lib/apt/lists/*
 
-# set work directory
-WORKDIR /home/app
-
-# set environment variables
+# Устанавливаем переменные окружения
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-
-#ENV HOME=/home/web
-#ENV APP_HOME=/home/orgproj/web
-#RUN mkdir $APP_HOME
-#RUN mkdir $APP_HOME/staticfiles
-#WORKDIR $APP_HOME
-
-# Delete build dependencies
-RUN pip install --upgrade pip                                       
+# Копируем файл требований и устанавливаем зависимости Python
 COPY requirements.txt .
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-COPY ./weather/entrypoint.sh .
-#RUN sed -i 's/\r$//g' /usr/src/web/entrypoint.sh
-RUN chmod +x /home/app/entrypoint.sh
+# Копируем скрипт для запуска приложения и устанавливаем права на выполнение
 
-RUN ls -la
-
-# copy project
+# Копируем весь проект в рабочую директорию
 COPY . .
-RUN ls -la
-#RUN ./entrypoint.sh
-ENTRYPOINT ["/home/app/web/gunicorn.sh"]
+
+# Выполняем команду для отображения содержимого директории (для отладки)
+RUN cd /home/app/weather/
+RUN ls -la weather
+
+# Запуск Django приложения через manage.py
+ENTRYPOINT ["python", "weather/manage.py"]
+
+# Запускаем сервер Django
+CMD ["runserver", "0.0.0.0:8000"]
