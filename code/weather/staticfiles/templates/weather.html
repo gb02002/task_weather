@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weather Forecast</title>
+</head>
+<body>
+    <h1>Weather Forecast</h1>
+
+    <!-- Форма для ввода города -->
+    <form method="get" action="{% url 'start_weather' %}">
+        <label for="city">Enter city name:</label>
+        <input type="text" id="city" name="city" required>
+        <button type="submit">Get Weather</button>
+    </form>
+
+    {% if city %}
+        <h2>Weather Forecast for {{ city }}</h2>
+        {% if result %}
+            <p>Current time: {{ result.current_time }}</p>
+            <p>Current temperature: {{ result.current_temperature }}°C</p>
+
+            <h3>Hourly Forecast</h3>
+            <ul>
+                {% for entry in result.hourly_forecast %}
+                    <li>{{ entry.time }}: {{ entry.temperature }}°C</li>
+                {% endfor %}
+            </ul>
+        {% elif message %}
+            <p>{{ message }}</p>
+        {% elif error %}
+            <p>Error: {{ error }}</p>
+        {% endif %}
+    {% else %}
+        <p>No city provided. Please enter a city to get the weather forecast.</p>
+    {% endif %}
+</body>
+</html>

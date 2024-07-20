@@ -23,7 +23,7 @@ class User_data(models.Model):
 class Stats(models.Model):
     id = models.AutoField(primary_key=True)
     city = models.CharField(max_length=60, unique=True, )
-    count_requests = models.IntegerField(default=0, null=False)
+    count_requests = models.IntegerField(default=1, null=False)
 
     def __str__(self):
         return f"Statistics of {self.city}"
